@@ -44,3 +44,13 @@ NLL_LVB <- function(ln_Linf, ln_k, t0, ln_sigma, obs.age, obs.length){
   NLL <- -1*sum(logLike, na.rm=TRUE) # We need to add na.rm as there are some NA's for weights in the dataset
   return(NLL)
 }
+
+#5fit data to male and female Northern Rockfish using mle2
+#male
+rockfish_male_model <- mle2(
+  
+  
+)
+
+#female
+rockfish_female_model
