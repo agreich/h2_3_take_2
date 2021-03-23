@@ -107,3 +107,5 @@ sigma_f
 
 #8 plot for each sex as points, models as lines. Like last time
 
+
+###PART 2##### Pollock Spawning Biomass calc
