@@ -9,6 +9,11 @@ goa <- read.csv("/Users/alexandrareich/Desktop/Fish 622 QuanFish/HW/HW3/goa_race
 # and known age and length
 library(tidyverse)
 library(dplyr)
+library(manipulate)
+library(bbmle)
+library(visreg) 
+library(ggthemes)
+library(manipulate)
 
 nr.dat <- goa %>% filter(Common.Name=="northern rockfish",
                          !is.na(Age..years.), !is.na(Length..mm.),
@@ -53,12 +58,12 @@ NLL_LVB <- function(ln_Linf, ln_k, t0, ln_sigma, obs.age, obs.length){
 obs.age_m <- nr.dat_m$Age..years.
 obs.length_m <- nr.dat_m$Length..mm.
 
-obs.length_m <- nr.dat_f$Age..years.
+obs.age_f <- nr.dat_f$Age..years.
 obs.length_f <- nr.dat_f$Length..mm.
 
 #male
 rockfish_male_model <- mle2( NLL_LVB,
-                             start=list(ln_Linf=in_Linf_m, ln_k=ln_k_m, t0=t0_m, ln_sigma=ln_sigma_m),
+                             start=list(ln_Linf=log(450), ln_k=log(0.2), t0=0, ln_sigma=log(0.5)),
                              data = list (obs.age=obs.age_m, obs.length=obs.length_m),
                              method = "Nelder-Mead",
                              optimizer= "nlminb",
@@ -67,9 +72,38 @@ rockfish_male_model <- mle2( NLL_LVB,
 
 #female
 rockfish_female_model <- mle2( NLL_LVB,
-                               start=list(ln_Linf=in_Linf, ln_k=ln_k, t0=t0, ln_sigma=ln_sigma),
-                               data = list (obs.age=obs.age, obs.length=obs.length),
+                               start=list(ln_Linf=log(500), ln_k=log(0.2), t0=0, ln_sigma=log(0.5)),
+                               data = list (obs.age=obs.age_f, obs.length=obs.length_f),
                                method = "Nelder-Mead",
                                optimizer= "nlminb",
                                control=list(maxit=1e6)
 )
+
+summary(rockfish_male_model)
+summary(rockfish_female_model)
+
+#6: extract parameter values from your pair of fitted models
+Linf_m <- exp(coef(rockfish_male_model)[1])
+k_m <- exp(coef(rockfish_male_model)[2])
+t0_m <- exp(coef(rockfish_male_model)[3])
+sigma_m <- exp(coef(rockfish_male_model)[4])
+
+Linf_f <- exp(coef(rockfish_female_model)[1])
+k_f <- exp(coef(rockfish_female_model)[2])
+t0_f <- exp(coef(rockfish_female_model)[3])
+sigma_f <- exp(coef(rockfish_female_model)[4])
+
+Linf_m 
+k_m 
+t0_m 
+sigma_m
+
+Linf_f 
+k_f 
+t0_f 
+sigma_f 
+
+#7 create a table of the parameter estimates and put this in the word doc.
+
+#8 plot for each sex as points, models as lines. Like last time
+
