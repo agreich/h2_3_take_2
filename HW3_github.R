@@ -61,7 +61,9 @@ obs.length_m <- nr.dat_m$Length..mm.
 obs.age_f <- nr.dat_f$Age..years.
 obs.length_f <- nr.dat_f$Length..mm.
 
-#male
+
+#?????????????????????????????????????????/
+#male #SHOULD t0 NOT BE ESIMATED IN START???????
 rockfish_male_model <- mle2( NLL_LVB,
                              start=list(ln_Linf=log(450), ln_k=log(0.2), t0=0, ln_sigma=log(0.5)),
                              data = list (obs.age=obs.age_m, obs.length=obs.length_m),
@@ -104,6 +106,7 @@ t0_f
 sigma_f 
 
 #7 create a table of the parameter estimates and put this in the word doc.
+##BUT, SHOULD t0 BE ESTIMATED? ASK DUIRNG OFFICE HOURS!!!
 
 #8 plot for each sex as points, models as lines. Like last time
 
