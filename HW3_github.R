@@ -13,6 +13,9 @@ library(dplyr)
 nr.dat <- goa %>% filter(Common.Name=="northern rockfish",
                          !is.na(Age..years.), !is.na(Length..mm.),
                          Sex!="Unknown")
+nr.dat_m <- nr.dat %>% filter(Sex=="Male")
+nr.dat_f <-nr.dat %>% filter(Sex=="Female")
+
 #3
 #create a von Bert function
 #first, predict age, says the corresponding lab (5)
@@ -46,11 +49,27 @@ NLL_LVB <- function(ln_Linf, ln_k, t0, ln_sigma, obs.age, obs.length){
 }
 
 #5fit data to male and female Northern Rockfish using mle2
+#starting values
+obs.age_m <- nr.dat_m$Age..years.
+obs.length_m <- nr.dat_m$Length..mm.
+
+obs.length_m <- nr.dat_f$Age..years.
+obs.length_f <- nr.dat_f$Length..mm.
+
 #male
-rockfish_male_model <- mle2(
-  
-  
+rockfish_male_model <- mle2( NLL_LVB,
+                             start=list(ln_Linf=in_Linf_m, ln_k=ln_k_m, t0=t0_m, ln_sigma=ln_sigma_m),
+                             data = list (obs.age=obs.age_m, obs.length=obs.length_m),
+                             method = "Nelder-Mead",
+                             optimizer= "nlminb",
+                             control=list(maxit=1e6)
 )
 
 #female
-rockfish_female_model
+rockfish_female_model <- mle2( NLL_LVB,
+                               start=list(ln_Linf=in_Linf, ln_k=ln_k, t0=t0, ln_sigma=ln_sigma),
+                               data = list (obs.age=obs.age, obs.length=obs.length),
+                               method = "Nelder-Mead",
+                               optimizer= "nlminb",
+                               control=list(maxit=1e6)
+)
