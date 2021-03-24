@@ -157,12 +157,13 @@ obs.length_3 <- pol.dat$Length..mm.
 
 model_wl <- mle2(NLL_wl,
                  start=list(ln_alpha = log(0.00005), ln_beta=log(3), ln_sigma_3=log(2)), #maybe try log 2
-                 data = list (obs.length_3, obs.weight_3),
+                 data = list (obs.length_3=obs.length_3, obs.weight_3=obs.weight_3),
                  method = "Nelder-Mead",
                  optimizer= "nlminb",
                  control=list(maxit=1e6)
 ) #what to start alpha and beta? beta is typically around 3. But what for alpha?
 summary(model_wl)
+coef(model_wl)
 # Explore with manipulate()
 #manipulate(plot_wl(data=pollock, alpha, beta), 
 #           alpha = slider(min=0, max=1e-5, initial=7e-6, step=1e-7),
@@ -171,8 +172,8 @@ summary(model_wl)
 #report your values to word doc!
 #get the values
 alpha <- exp(coef(model_wl)[1])
-beta <- 
-sigma_3 <- 
+beta <- exp(coef(model_wl)[2])
+sigma_3 <- exp(coef(model_wl)[3])
   
 alpha
 beta
@@ -180,5 +181,10 @@ sigma_3
 
 
 #3.5 GRAPH
+pred_model_weight <- pred_wl(L=obs.length_3, alpha=alpha, beta=beta)
 
+ggplot()+geom_point(aes(x=obs.length_3, y=obs.weight_3)) + geom_line(aes(x=obs.length_3, y=pred_model_weight), color="red")+
+  xlab("Weight")+ylab("Length")
+
+#3.6 VON BERT
 
