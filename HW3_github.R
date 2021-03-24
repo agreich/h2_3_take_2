@@ -87,12 +87,12 @@ summary(rockfish_female_model)
 #6: extract parameter values from your pair of fitted models
 Linf_m <- exp(coef(rockfish_male_model)[1])
 k_m <- exp(coef(rockfish_male_model)[2])
-t0_m <- exp(coef(rockfish_male_model)[3])
+t0_m <-coef(rockfish_male_model)[3]
 sigma_m <- exp(coef(rockfish_male_model)[4])
 
 Linf_f <- exp(coef(rockfish_female_model)[1])
 k_f <- exp(coef(rockfish_female_model)[2])
-t0_f <- exp(coef(rockfish_female_model)[3])
+t0_f <- coef(rockfish_female_model)[3]
 sigma_f <- exp(coef(rockfish_female_model)[4])
 
 Linf_m 
@@ -111,4 +111,25 @@ sigma_f
 #8 plot for each sex as points, models as lines. Like last time
 
 
-###PART 2##### Pollock Spawning Biomass calc
+###PART 3##### Pollock Per-Recruit Analysis
+#what age is biomass maxxed?
+# first develop an approx (predicted?) for pollock weight at age W(t)
+#load pollock data
+pol.dat <- read.csv(file="/Users/alexandrareich/Desktop/Fish 622 QuanFish/HW/HW3/pollock_race_specimen.csv", header=TRUE, skip=6)
+
+#subset for complete observations
+pol.dat <- pol.dat %>% filter(!is.na(Age..years.),
+                              !is.na(Length..mm.),
+                              !is.na(Weight..gm.))
+
+#create a function called pred_wl
+pred_wl <- function (L, alpha, beta){
+  weight(L(t)) <- alpha*(L^beta)
+  return(weight(L(t)))
+}
+
+#create a NLL function
+NLL_wl <- function (ln_alpha, ln_beta, ln_sigma_3, obs.length_3, obs.weight_3){
+  
+  
+}
