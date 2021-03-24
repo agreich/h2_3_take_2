@@ -124,12 +124,61 @@ pol.dat <- pol.dat %>% filter(!is.na(Age..years.),
 
 #create a function called pred_wl
 pred_wl <- function (L, alpha, beta){
-  weight(L(t)) <- alpha*(L^beta)
-  return(weight(L(t)))
+  weight <- alpha*(L^beta)
+  return(weight)
 }
 
+test <- pred_wl(L=obs.length_3, alpha=0.00005, beta=3)
+test
 #create a NLL function
 NLL_wl <- function (ln_alpha, ln_beta, ln_sigma_3, obs.length_3, obs.weight_3){
+  #exponentiate the thing
+  alpha <- exp(ln_alpha)
+  beta <- exp(ln_beta)
+  sigma_3 <- exp(ln_sigma_3)
   
+  # Create model predictions
+  pred.weight <- pred_wl(L=obs.length_3, alpha=alpha, beta=beta)
   
+  # Calculate log-likelihood (from a lognormal distribution)
+  #  NOTE: offset, because there are age-0 fish and log(0)= -Infinity
+  logLike <- dnorm(x=log(obs.weight_3 +1e-6), mean=log(pred.weight +1e-6), sd=sigma_3, log=TRUE) #so why is observed and predicted where they are?
+  
+  # Calculate total negative log likelihood
+  NLL <- -1*sum(logLike, na.rm=TRUE) # We need to add na.rm as there are some NA's for weights in the dataset
+  return(NLL)
 }
+
+#3.4 fit the model using MLE2
+#report the estimated parameter values in the word doc
+#give data to the data
+obs.weight_3 <- pol.dat$Weight..gm.
+obs.length_3 <- pol.dat$Length..mm.
+
+model_wl <- mle2(NLL_wl,
+                 start=list(ln_alpha = log(0.00005), ln_beta=log(3), ln_sigma_3=log(2)), #maybe try log 2
+                 data = list (obs.length_3, obs.weight_3),
+                 method = "Nelder-Mead",
+                 optimizer= "nlminb",
+                 control=list(maxit=1e6)
+) #what to start alpha and beta? beta is typically around 3. But what for alpha?
+summary(model_wl)
+# Explore with manipulate()
+#manipulate(plot_wl(data=pollock, alpha, beta), 
+#           alpha = slider(min=0, max=1e-5, initial=7e-6, step=1e-7),
+ #          beta = slider(min=2, max=4, initial=3, step=0.001)
+#)
+#report your values to word doc!
+#get the values
+alpha <- exp(coef(model_wl)[1])
+beta <- 
+sigma_3 <- 
+  
+alpha
+beta
+sigma_3
+
+
+#3.5 GRAPH
+
+
