@@ -7,6 +7,7 @@ goa <- read.csv("/Users/alexandrareich/Desktop/Fish 622 QuanFish/HW/HW3/goa_race
 #filter the data to only include northern Rockfish
 #only include knwonw sex
 # and known age and length
+library(tvthemes)
 library(tidyverse)
 library(dplyr)
 library(manipulate)
@@ -14,6 +15,7 @@ library(bbmle)
 library(visreg) 
 library(ggthemes)
 library(manipulate)
+library(cowplot)
 
 nr.dat <- goa %>% filter(Common.Name=="northern rockfish",
                          !is.na(Age..years.), !is.na(Length..mm.),
@@ -109,6 +111,24 @@ sigma_f
 ##BUT, SHOULD t0 BE ESTIMATED? ASK DUIRNG OFFICE HOURS!!!
 
 #8 plot for each sex as points, models as lines. Like last time
+pred_length_M <- pred_LVB(age=obs.age_m, Linf=Linf_m, k=k_m, t0=t0_m)
+pred_length_F <- pred_LVB(age=obs.age_f, Linf=Linf_f, k=k_f, t0=t0_f)
+
+#male plot
+ggplot()+geom_point(aes(x=obs.age_m, y=obs.length_m)) + geom_line(aes(x=obs.age_m, y=pred_length_M), color="red")+
+  xlab("Age")+ylab("Length") +theme_cowplot()
+#female plot
+ggplot()+geom_point(aes(x=obs.age_f, y=obs.length_f)) +geom_line(aes(x=obs.age_f, y=pred_length_F), color="red") +
+  xlab("Age") +ylab("Length")+theme_cowplot() #+
+  #scale_color_avatar(pallete="FireNation")+
+  #theme_avatar()
+
+
+
+
+
+
+
 
 
 ###PART 3##### Pollock Per-Recruit Analysis
@@ -186,5 +206,47 @@ pred_model_weight <- pred_wl(L=obs.length_3, alpha=alpha, beta=beta)
 ggplot()+geom_point(aes(x=obs.length_3, y=obs.weight_3)) + geom_line(aes(x=obs.length_3, y=pred_model_weight), color="red")+
   xlab("Weight")+ylab("Length")
 
-#3.6 VON BERT
+######3.6 VON BERT
+#predLVB function should still work here...
+#pred_LVB(age,Linf, k, t0)
+#will NLL function work?
+#I think it will!
+obs.age_3 <- pol.dat$Age..years.
+pollock_vonBert <- mle2(NLL_LVB,
+                        start=list(ln_Linf=log(700), ln_k=log(0.2), t0=0, ln_sigma=log(0.5)),
+                        data = list (obs.age=obs.age_3, obs.length=obs.length_3),
+                        method = "Nelder-Mead",
+                        optimizer= "nlminb",
+                        control=list(maxit=1e6)
+                        )
+summary(pollock_vonBert)
+coef(pollock_vonBert)
+
+#get the coefficients
+Linf_p <- exp(coef(pollock_vonBert)[1])
+k_p <- exp(coef(pollock_vonBert)[2])
+t0_p <- coef(pollock_vonBert)[3]
+sigma_p <- exp(coef(pollock_vonBert)[4])
+
+Linf_p 
+k_p 
+t0_p 
+sigma_p
+
+#plot the von Bert
+pred_pollock_length_vonBert <- pred_LVB(pol.dat$Age..years., Linf_p, k_p, t0_p)
+
+ggplot()+geom_point(aes(x=pol.dat$Age..years., y=obs.length_3)) +geom_line(aes(x=pol.dat$Age..years., y=pred_pollock_length_vonBert), color="red") +
+  xlab("Age") +ylab("Length")+theme_cowplot() #+
+
+
+
+
+#STARTING THE PART WITHOUT NUMBERS
+ages <- c(1:15)
+ages
+#predict the weight at age for this range of ages
+length_at_age <- pred_LVB(ages, Linf_p, k_p, t0_p)
+waa <- pred_wl(length_at_age, alpha, beta)
+waa
 
