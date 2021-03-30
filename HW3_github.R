@@ -250,3 +250,31 @@ length_at_age <- pred_LVB(ages, Linf_p, k_p, t0_p)
 waa <- pred_wl(length_at_age, alpha, beta)
 waa
 
+ages2 <- c(0:14)
+ages2
+#the weird part in pink
+#create a vector N the length of ages
+#N <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+#length(N)
+
+#N1 <- 1000
+M <- 0.3
+#instantaneous natural mortality formula
+#N0*exp(-Zt)
+Nt <- N1 *exp(-M*ages2)
+Nt
+
+#the for loop, which I'm choosing not to use:
+
+
+
+#calculate expected Biomass at age B(t)
+B <- waa * Nt
+max(B)
+B  
+  
+
+#plot weight, age, biomass
+par(mrow=c(3,1))
+ggplot()+aes(x=)
+
