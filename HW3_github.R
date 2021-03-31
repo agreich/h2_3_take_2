@@ -275,6 +275,54 @@ B
   
 
 #plot weight, age, biomass
-par(mrow=c(3,1))
-ggplot()+aes(x=)
+#par(mrow=c(3,1))
+#make three plots, and then combine into one with GGplot
 
+#plot numbers(Nt) at age
+p1 <- ggplot()+aes(x=ages, y=Nt)+geom_point()+theme_cowplot() +xlab("Age") +ylab("N(t)")
+
+#plot weight at age
+p2 <- ggplot()+aes(x=ages, y=waa)+geom_point()+theme_cowplot() +xlab("Age") +ylab("W(t)")
+
+#plotbiomass at age
+p3 <- ggplot()+aes(x=ages, y=B)+geom_point()+theme_cowplot() +xlab("Age") +ylab("B(t)")
+
+#combine into a three panel figure
+plot_grid(p1,p2,p3, nrow=3, ncol=1)
+
+
+#repeat process but natural mort is 0.9 for age-1, 0.45 for age 2, 0.3 for ages 3+
+M1 <- 0.9
+M2 <- 0.45
+M3 <- 0.3
+
+#ugh, now I need a for loop
+N_diff_morts <- vector(length=15)
+N_diff_morts[1] <-1000
+N_diff_morts[2] <-N_diff_morts[1]*exp(-M1)
+N_diff_morts[3] <-N_diff_morts[2]*exp(-M2)
+for (i in 3:(length(N_diff_morts)-1)){
+  N_diff_morts[i+1] <- N_diff_morts[i]*exp(-M3)
+  print(i)
+}
+N.2 <- N_diff_morts
+
+#waa should be the same?
+waa
+
+#calc biomass
+B.2 <- N.2 *waa
+B.2
+
+#plot the things
+#plot numbers at age
+p1 <- ggplot()+aes(x=ages, y=N.2)+geom_point()+theme_cowplot() +xlab("Age") +ylab("N(t)")
+
+#plot weight at age
+p2 <- ggplot()+aes(x=ages, y=waa)+geom_point()+theme_cowplot() +xlab("Age") +ylab("W(t)")
+
+#plotbiomass at age
+p3 <- ggplot()+aes(x=ages, y=B.2)+geom_point()+theme_cowplot() +xlab("Age") +ylab("B(t)")
+
+#combine into a three panel figure
+plot_grid(p1,p2,p3, nrow=3, ncol=1)
